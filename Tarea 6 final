@@ -1,0 +1,208 @@
+#1
+import tensorflow as tf
+import matplotlib.pyplot as plt
+import cv2
+import numpy as np
+from tensorflow.keras import models, layers
+# Función para convertir imágenes RGB a escala de grises
+def rgb_to_grayscale(image):
+    return tf.image.rgb_to_grayscale(image)
+# Definir una capa Lambda para aplicar la función personalizada
+gray_scale_layer = tf.keras.layers.Lambda(rgb_to_grayscale)
+# Modelo de ejemplo con la capa Lambda
+model = tf.keras.Sequential([
+    tf.keras.layers.Input(shape=(200, 200, 3)),  # Supongamos que las imágenes son de tamaño variable
+    gray_scale_layer
+])
+# Cargar una imagen a color de ejemplo
+image_path = "jackatlas.png"  # Cambia esto por la ruta de tu imagen
+image = tf.io.read_file(image_path)
+image = tf.image.decode_jpeg(image, channels=3)
+image = tf.image.resize(image, [224, 224])  # Redimensionar la imagen si es necesario
+# Normalizar la imagen
+image = image / 255.0
+# Realizar la predicción (convertir a escala de grises)
+gray_image = model.predict(tf.expand_dims(image, 0))[0]
+# Mostrar las imágenes original y en escala de grises
+plt.subplot(1, 2, 1)
+plt.imshow(image)
+plt.title('Imagen original')
+plt.axis('off')
+plt.subplot(1, 2, 2)
+plt.imshow(tf.squeeze(gray_image, axis=-1), cmap='gray')
+plt.title('Imagen en escala de grises')
+plt.axis('off')
+plt.show()
+# 2
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+
+# Definir  función
+def funcion(x):
+    return 3 * np.sin(np.pi * x)
+
+# datos de entrenamiento
+x_train = np.linspace(-1, 1, 100)
+y_train = funcion(x_train)
+
+# modelo
+model = Sequential([
+    Dense(10, activation='tanh', input_shape=(1,)),
+    Dense(1)
+])
+
+# Compilar modelo
+model.compile(optimizer='adam', loss='mse')
+
+# Entrenar  modelo
+history = model.fit(x_train, y_train, epochs=10000, verbose=0)
+
+# Evalualuacion de modelo en el conjunto de entrenamiento
+loss = model.evaluate(x_train, y_train, verbose=0)
+print("Loss:", loss)
+
+#  datos para la visualización
+x_test = np.linspace(-1, 1, 100)
+y_pred = model.predict(x_test)
+
+# Graficar la solución de la red junto con la función original
+plt.plot(x_test, y_pred, label="Aproximación de la red")
+plt.plot(x_test, funcion(x_test), label="Función original")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.title("Aproximación de la red vs Función original")
+plt.legend()
+plt.show()
+# 2 b)
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+
+# Definir  función
+def funcion(x):
+    return 3 * np.sin(np.pi * x)
+
+# datos de entrenamiento
+x_train = np.linspace(-1, 1, 100)
+y_train = funcion(x_train)
+
+# modelo
+model = Sequential([
+    Dense(10, activation='tanh', input_shape=(1,)),
+    Dense(10, activation='tanh', input_shape=(1,)),
+    Dense(10, activation='tanh', input_shape=(1,)),
+    Dense(1)
+])
+
+# Compilar modelo
+model.compile(optimizer='adam', loss='mse')
+
+# Entrenar  modelo
+history = model.fit(x_train, y_train, epochs=10000, verbose=0)
+
+# Evalualuacion de modelo en el conjunto de entrenamiento
+loss = model.evaluate(x_train, y_train, verbose=0)
+print("Loss:", loss)
+
+#  datos para la visualización
+x_test = np.linspace(-1, 1, 100)
+y_pred = model.predict(x_test)
+
+# Graficar la solución de la red junto con la función original
+plt.plot(x_test, y_pred, label="Aproximación de la red")
+plt.plot(x_test, funcion(x_test), label="Función original")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.title("Aproximación de la red vs Función original")
+plt.legend()
+plt.show()
+#3
+from tensorflow.keras.layers import Dense
+
+# Definir el modelo con una arquitectura más compleja
+model = tf.keras.Sequential([
+    Dense(32, activation='relu', input_shape=(1,)),  # Capa densa  activación ReLU
+    Dense(64, activation='relu'),  # Capa densa  activación ReLU
+    Dense(32, activation='relu'),  # Capa densa  activación ReLU
+    Dense(1)  # Capa de salida lineal
+])
+
+# Compilar  modelo
+model.compile(optimizer='adam', loss='mse')
+
+# Entrenar  modelo
+history = model.fit(x_train, y_train, epochs=100, verbose=0)
+
+# Evaluacion del modelo en el conjunto de entrenamiento
+loss = model.evaluate(x_train, y_train, verbose=0)
+print("Loss:", loss)
+
+# Generar datos para la visualización
+x_test = np.linspace(-1, 1, 100)
+y_pred = model.predict(x_test)
+
+# Graficar la solución de la red junto con la función original
+import matplotlib.pyplot as plt
+plt.plot(x_test, y_pred, label="Aproximación de la red")
+plt.plot(x_test, target_function(x_test), label="Función original")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.title("Aproximación de la red vs Función original")
+plt.legend()
+plt.show()
+#4 b)
+import numpy as np
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+import matplotlib.pyplot as plt
+
+# Definir ecuación diferencial
+def differential_equation(y, dy_dx):
+    return -y
+
+# Discretizar  intervalo
+x_values = np.linspace(-6, 6, 100)
+
+# Calcular y' aproximado usando diferencias finitas
+delta_x = x_values[1] - x_values[0]
+y_prime_approx = np.gradient(y_exact, delta_x)
+
+# Construir  modelo de red neuronal
+model = Sequential([
+    Dense(100, activation='tanh', input_shape=(1,)),
+    Dense(1)
+])
+model.compile(optimizer='adam', loss='mse')
+
+# Entrenar red neuronal para predecir y en cada punto del intervalo
+history = model.fit(x_values.reshape(-1, 1), y_prime_approx.reshape(-1, 1), epochs=1000, verbose=0)
+
+# Obtener su solución numérica aproximada
+y_numeric_approx = np.zeros_like(x_values)
+y_numeric_approx[0] = 1  # Condición inicial y(0) = 1
+y_prime_approx[0] = -0.5  # Condición inicial y'(0) = -0.5
+for i in range(1, len(x_values)):
+    y_numeric_approx[i] = y_numeric_approx[i-1] + y_prime_approx[i-1] * delta_x
+    y_prime_approx[i] = y_prime_approx[i-1] + differential_equation(y_numeric_approx[i-1], y_prime_approx[i-1]) * delta_x
+
+# Definir la solución analítica
+def analytical_solution(x):
+    A = 1  # Como y(0) = 1
+    B = -0.5  # y'(0) = -0.5
+    return np.cos(x) + B * np.sin(x)
+
+# Discretizar el intervalo
+x_values = np.linspace(-6, 6, 100)
+
+# Calcular la solución numérica
+# (Este código ya se proporcionó en la respuesta anterior)
+
+# Graficar la solución numérica y analítica
+plt.plot(x_values, y_numeric_approx, label='Solución numérica')
+plt.plot(x_values, analytical_solution(x_values), label='Solución analítica', linestyle='--')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.title('Solución numérica vs Solución analítica de la Ecuación Diferencial')
+plt.legend()
+plt.show()
+#no pude con esta :(
