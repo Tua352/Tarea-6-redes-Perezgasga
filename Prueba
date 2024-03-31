@@ -1,0 +1,334 @@
+#Tarea 6
+1. Diseñar una capa en keras que transforme imágenes a color en escala de grises. Pueden usar la base de datos mnist o cualquier otra para hacer las pruebas.
+import tensorflow as tf
+import matplotlib.pyplot as plt
+import cv2
+import numpy as np
+from tensorflow.keras import models, layers
+# Función para convertir imágenes RGB a escala de grises
+def rgb_to_grayscale(image):
+    return tf.image.rgb_to_grayscale(image)
+    # Definir una capa Lambda para aplicar la función personalizada
+gray_scale_layer = tf.keras.layers.Lambda(rgb_to_grayscale)
+# Modelo de ejemplo con la capa Lambda
+model = tf.keras.Sequential([
+    tf.keras.layers.Input(shape=(480, 272, 3)),  # Supongamos que las imágenes son de tamaño variable
+    gray_scale_layer
+])
+# Cargar una imagen a color de ejemplo
+image_path = "jackatlas.png"  # Cambia esto por la ruta de tu imagen
+image = tf.io.read_file(image_path)
+image = tf.image.decode_jpeg(image, channels=3)
+image = tf.image.resize(image, [224, 224])  # Redimensionar la imagen si es necesario
+# Normalizar la imagen
+image = image / 255.0
+# Realizar la predicción (convertir a escala de grises)
+gray_image = model.predict(tf.expand_dims(image, 0))[0]
+# Mostrar las imágenes original y en escala de grises
+plt.subplot(1, 2, 1)
+plt.imshow(image)
+plt.title('Imagen original')
+plt.axis('off')
+plt.subplot(1, 2, 2)
+plt.imshow(tf.squeeze(gray_image, axis=-1), cmap='gray')
+plt.title('Imagen en escala de grises')
+plt.axis('off')
+plt.show()
+#Prueba 2
+# Función para convertir imágenes RGB a escala de grises
+def rgb_to_grayscale(image):
+    return tf.image.rgb_to_grayscale(image)
+# Definir una capa Lambda para aplicar la función personalizada
+gray_scale_layer = tf.keras.layers.Lambda(rgb_to_grayscale)
+# Modelo de ejemplo con la capa Lambda
+model = tf.keras.Sequential([
+    tf.keras.layers.Input(shape=(None, None, 3)),  # Supongamos que las imágenes son de tamaño variable
+    gray_scale_layer
+])
+# Cargar una imagen a color de ejemplo
+image_path = "jackatlas.png"  # Cambia esto por la ruta de tu imagen
+image = tf.io.read_file(image_path)
+image = tf.image.decode_jpeg(image, channels=3)
+image = tf.image.resize(image, [224, 224])  # Redimensionar la imagen si es necesario
+# Normalizar la imagen
+image = image / 255.0
+# Realizar la predicción (convertir a escala de grises)
+gray_image = model.predict(tf.expand_dims(image, 0))[0]
+# Mostrar las imágenes original y en escala de grises
+plt.subplot(1, 2, 1)
+plt.imshow(image)
+plt.title('Imagen original')
+plt.axis('off')
+plt.subplot(1, 2, 2)
+plt.imshow(tf.squeeze(gray_image, axis=-1), cmap='gray')
+plt.title('Imagen en escala de grises')
+plt.axis('off')
+plt.show()
+2. Entrena una red neuronal para que reproduzca las siguientes funciones en el intervalo de [-1,1]. Graficar la solución de la red en conjunto con la gráfica de la función
+(a) 3 sin(πx)
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+
+# Definir  función
+def funcion(x):
+    return 3 * np.sin(np.pi * x)
+
+# datos de entrenamiento
+x_train = np.linspace(-1, 1, 100)
+y_train = funcion(x_train)
+
+# modelo
+model = Sequential([
+    Dense(10, activation='tanh', input_shape=(1,)),
+    Dense(10, activation='tanh', input_shape=(1,)),
+    Dense(10, activation='tanh', input_shape=(1,)),
+    Dense(1)
+])
+
+# Compilar modelo
+model.compile(optimizer='adam', loss='mse')
+
+# Entrenar  modelo
+history = model.fit(x_train, y_train, epochs=1000, verbose=0)
+
+# Evalualuacion de modelo en el conjunto de entrenamiento
+loss = model.evaluate(x_train, y_train, verbose=0)
+print("Loss:", loss)
+
+#  datos para la visualización
+x_test = np.linspace(-1, 1, 100)
+y_pred = model.predict(x_test)
+#inetnto 2
+# Graficar la solución de la red junto con la función original
+plt.plot(x_test, y_pred, label="Aproximación de la red")
+plt.plot(x_test, funcion(x_test), label="Función original")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.title("Aproximación de la red vs Función original")
+plt.legend()
+plt.show()
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+
+# Definir  función
+def funcion(x):
+    return 3 * np.sin(np.pi * x)
+
+# datos de entrenamiento
+x_train = np.linspace(-1, 1, 100)
+y_train = funcion(x_train)
+
+# modelo
+model = Sequential([
+    Dense(100, activation='tanh', input_shape=(1,)),
+    Dense(100, activation='tanh', input_shape=(1,)),
+    Dense(1)
+])
+
+# Compilar modelo
+model.compile(optimizer='adam', loss='mse')
+
+# Entrenar  modelo
+history = model.fit(x_train, y_train, epochs=1000, verbose=0)
+
+# Evalualuacion de modelo en el conjunto de entrenamiento
+loss = model.evaluate(x_train, y_train, verbose=0)
+print("Loss:", loss)
+
+#  datos para la visualización
+x_test = np.linspace(-1, 1, 100)
+y_pred = model.predict(x_test)
+
+# Graficar la solución de la red junto con la función original
+plt.plot(x_test, y_pred, label="Aproximación de la red")
+plt.plot(x_test, funcion(x_test), label="Función original")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.title("Aproximación de la red vs Función original")
+plt.legend()
+plt.show()
+# (b) 1 + 2x+ 4x3
+# Definir función objetivo
+def target_function(x):
+    return 1 + 2*x + 4*x*x*x
+
+# datos de entrenamiento
+x_train = np.linspace(-1, 1, 100)
+y_train = target_function(x_train)
+
+# Construir  modelo
+model = Sequential([
+    Dense(50, activation='tanh', input_shape=(1,)),
+    Dense(1)
+])
+
+# Compilar el modelo
+model.compile(optimizer='adam', loss='mse')
+
+# Entrenar el modelo
+history = model.fit(x_train, y_train, epochs=1500, verbose=0)
+
+# Evaluacion del modelo en el conjunto de entrenamiento
+loss = model.evaluate(x_train, y_train, verbose=0)
+print("Loss:", loss)
+
+#  datos para la visualización
+x_test = np.linspace(-1, 1, 100)
+y_pred = model.predict(x_test)
+
+# Graficar la solución de la red junto con la función original
+plt.plot(x_test, y_pred, label="Aproximación de la red")
+plt.plot(x_test, target_function(x_test), label="Función original")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.title("Aproximación de la red vs Función original")
+plt.legend()
+plt.show()
+# Definir función objetivo
+def target_function(x):
+    return 1 + 2*x + 4*x*x*x
+
+# datos de entrenamiento
+x_train = np.linspace(-1, 1, 100)
+y_train = target_function(x_train)
+
+# Construir  modelo
+model = Sequential([
+    Dense(100, activation='tanh', input_shape=(1,)),
+    Dense(100, activation='tanh', input_shape=(1,)),
+    Dense(1)
+])
+
+# Compilar el modelo
+model.compile(optimizer='adam', loss='mse')
+
+# Entrenar el modelo
+history = model.fit(x_train, y_train, epochs=1500, verbose=0)
+
+# Evaluacion del modelo en el conjunto de entrenamiento
+loss = model.evaluate(x_train, y_train, verbose=0)
+print("Loss:", loss)
+
+#  datos para la visualización
+x_test = np.linspace(-1, 1, 100)
+y_pred = model.predict(x_test)
+
+# Graficar la solución de la red junto con la función original
+plt.plot(x_test, y_pred, label="Aproximación de la red")
+plt.plot(x_test, target_function(x_test), label="Función original")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.title("Aproximación de la red vs Función original")
+plt.legend()
+plt.show()
+#  3
+from tensorflow.keras.layers import Dropout
+
+# Definir  capa personalizada de polinomio de grado 3
+class PolynomialLayer(Layer):
+    def __init__(self):
+        super(PolynomialLayer, self).__init__()
+        # Inicializar  coeficientes de polinomio como variables entrenables
+        self.a0 = tf.Variable(initial_value=0.0, trainable=True)
+        self.a1 = tf.Variable(initial_value=0.0, trainable=True)
+        self.a2 = tf.Variable(initial_value=0.0, trainable=True)
+        self.a3 = tf.Variable(initial_value=0.0, trainable=True)
+
+    def call(self, inputs):
+        # Calcular  polinomio de grado 3: f(x) = a0 + a1*x + a2*x^2 + a3*x^3
+        x = inputs
+        return self.a0 + self.a1*x + self.a2*x**2 + self.a3*x**3
+
+# Definir  función objetivo
+def target_function(x):
+    return np.cos(2*x)
+
+# Generar datos de entrenamiento
+x_train = np.linspace(-1, 1, 100)
+y_train = target_function(x_train)
+
+# Definir el modelo con Dropout
+model = tf.keras.Sequential([
+    PolynomialLayer(),
+    Dropout(0.2),  # Tasa de dropout del 20%
+])
+
+# Compilacion del modelo
+model.compile(optimizer='adam', loss='mse')
+
+# Entrenar el modelo
+history = model.fit(x_train, y_train, epochs=2000, verbose=0)
+
+# Evaluacion del modelo  del conjunto de entrenamiento
+loss = model.evaluate(x_train, y_train, verbose=0)
+print("Loss:", loss)
+
+# Generar datos para la visualización
+x_test = np.linspace(-1, 1, 100)
+y_pred = model.predict(x_test)
+
+# Graficar la solución de la red junto con la función original
+import matplotlib.pyplot as plt
+plt.plot(x_test, y_pred, label="Aproximación de la red")
+plt.plot(x_test, target_function(x_test), label="Función original")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.title("Aproximación de la red vs Función original")
+plt.legend()
+plt.show()
+#prueba 2
+from tensorflow.keras.layers import Layer
+
+
+# Definir la capa personalizada de polinomio de grado 3
+class PolynomialLayer(Layer):
+    def __init__(self):
+        super(PolynomialLayer, self).__init__()
+        # Inicializar los coeficientes del polinomio como variables entrenables
+        self.a0 = tf.Variable(initial_value=0.0, trainable=True)
+        self.a1 = tf.Variable(initial_value=0.0, trainable=True)
+        self.a2 = tf.Variable(initial_value=0.0, trainable=True)
+        self.a3 = tf.Variable(initial_value=0.0, trainable=True)
+
+    def call(self, inputs):
+        # Calcular  polinomio de grado 3: f(x) = a0 + a1*x + a2*x^2 + a3*x^3
+        x = inputs
+        return self.a0 + self.a1*x + self.a2*x**2 + self.a3*x**3
+
+# Definir  función objetivo
+def target_function(x):
+    return np.cos(2*x)
+
+# Generar datos de entrenamiento
+x_train = np.linspace(-1, 1, 100)
+y_train = target_function(x_train)
+
+# Construir modelo con la capa personalizada del polinomio de grado 3
+model = tf.keras.Sequential([
+    PolynomialLayer()
+])
+
+# Compilacion del modelo
+model.compile(optimizer='adam', loss='mse')
+
+# Entrenar el modelo
+history = model.fit(x_train, y_train, epochs=2000, verbose=0)
+
+# Evaluacion  del modelo del conjunto de entrenamiento
+loss = model.evaluate(x_train, y_train, verbose=0)
+print("Loss:", loss)
+
+#  datos para la visualización
+x_test = np.linspace(-1, 1, 100)
+y_pred = model.predict(x_test)
+
+# Graficar la solución de la red junto con la función original
+import matplotlib.pyplot as plt
+plt.plot(x_test, y_pred, label="Aproximación de la red")
+plt.plot(x_test, target_function(x_test), label="Función original")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.title("Aproximación de la red vs Función original")
+plt.legend()
+plt.show()
+
